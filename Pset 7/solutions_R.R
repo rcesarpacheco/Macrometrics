@@ -92,13 +92,14 @@ S <- 10000
 B <- 1000
 N_gibbs <- S+B
 
-# draw initial theta
 theta <- matrix(nrow = N_gibbs,ncol=2)
 beta <- matrix(nrow = N_gibbs,ncol=2)
 lambda <- numeric(N_gibbs)
 var_1 <- numeric(N_gibbs)
 var_2 <- numeric(N_gibbs)
 lambda_values <- 1:(N-1)
+
+# initial values. Prior mean
 lambda[1] <- 250
 var_1[1] <- 1/((a1-1)*a2)
 var_2[1] <- 1/((b1-1)*b2)
@@ -112,8 +113,6 @@ for (i in 2:N_gibbs) {
   vcov_theta_posterior <- solve(t(X_theta)%*%X_theta/var_1[i-1]+solve(V_theta))
   mu_theta_posterior <- vcov_theta_posterior%*%(t(X_theta)%*%X_theta%*%theta_hat/var_1[i-1]+solve(V_theta)%*%mu_theta)
   theta[i,] <- rand_biv_normal(mu_theta_posterior,vcov_theta_posterior,1,100)
-  
-  
   
   beta_hat <- solve(t(X_beta)%*%X_beta)%*%t(X_beta)%*%Y_beta
   vcov_beta_posterior <- solve(t(X_beta)%*%X_beta/var_2[i-1]+solve(V_beta))
@@ -146,6 +145,7 @@ colMeans(beta[(B+1):N,])
 mean(var_1[(B+1):N])
 mean(var_2[(B+1):N])
 mean(lambda[(B+1):N])
+
 ################################
 #                              #
 #          Problem 3           #
@@ -204,9 +204,6 @@ df_results <- data.frame('Variable' = c("beta_0", "beta_{1}","Phi(beta_0+2\beta_
                          'Posterior St. Dev.' = c(sd_betas,sd_prob),
                          check.names=FALSE)
 clipr::write_clip(df_results)       
-# writeLines(capture.output(stargazer(df_results,summary = F,
-#                                     rownames = F,
-#                                     table.placement = 'H')), here('table_q3.tex'))
 
 
 # # Monte Carlo to check if the mean is centered properly
